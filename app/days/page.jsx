@@ -23,8 +23,17 @@ export default function DaysPage() {
   const scoped = itinerary.filter((i) => scope === "all" || i.travelerId === scope);
 
   const saveItem = (form) => {
-    if (modal.type === "add") setItinerary((prev) => [...prev, { ...form, id: uid(), outfit: null }]);
-    else setItinerary((prev) => prev.map((i) => (i.id === modal.item.id ? { ...i, ...form } : i)));
+    const { travelerIds, ...rest } = form;
+    if (modal.type === "add") {
+      const ids = travelerIds?.length ? travelerIds : [rest.travelerId];
+      setItinerary((prev) => [
+        ...prev,
+        ...ids.map((travelerId) => ({ ...rest, travelerId, id: uid(), outfit: null })),
+      ]);
+    } else {
+      const travelerId = travelerIds?.[0] || rest.travelerId;
+      setItinerary((prev) => prev.map((i) => (i.id === modal.item.id ? { ...rest, travelerId } : i)));
+    }
     setModal(null);
   };
   const saveOutfit = (form) => {
@@ -178,10 +187,11 @@ export default function DaysPage() {
       {modal?.type === "add" && (
         <Modal title="Add to itinerary" onClose={() => setModal(null)}>
           <ItineraryForm
+            mode="add"
             item={modal.presetDate ? {
               date: modal.presetDate, cityId: trip.cities[0]?.id, timeOfDay: "Daytime",
               activity: "", type: "Sightseeing", notes: "",
-              travelerId: scope === "all" ? travelers[0]?.id : scope,
+              travelerSelection: scope === "all" ? "both" : scope,
             } : null}
             cities={trip.cities}
             travelers={travelers}
@@ -192,7 +202,7 @@ export default function DaysPage() {
       )}
       {modal?.type === "edit" && (
         <Modal title="Edit activity" onClose={() => setModal(null)}>
-          <ItineraryForm item={modal.item} cities={trip.cities} travelers={travelers} onSave={saveItem} onClose={() => setModal(null)} />
+          <ItineraryForm mode="edit" item={modal.item} cities={trip.cities} travelers={travelers} onSave={saveItem} onClose={() => setModal(null)} />
         </Modal>
       )}
       {modal?.type === "outfit" && (
