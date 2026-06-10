@@ -69,7 +69,9 @@ export default function DashboardPage() {
         </button>
         <div style={{ position: "absolute", left: 26, right: 26, bottom: 28 }}>
           <div style={{ fontSize: 10.5, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(251,249,246,0.8)", fontWeight: 500, marginBottom: 10 }}>
-            {fmtDate(firstDate)} — {fmtDate(lastDate)} · {days} days
+            {firstDate && lastDate
+              ? `${fmtDate(firstDate)} — ${fmtDate(lastDate)} · ${days} days`
+              : "Add destinations in Settings"}
           </div>
           <h1 style={{ fontFamily: serif, fontSize: 38, fontWeight: 500, letterSpacing: "-0.015em", lineHeight: 1.05, color: "#FBF9F6" }}>
             {trip.name}

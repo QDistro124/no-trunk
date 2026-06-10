@@ -10,8 +10,8 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000 — sample data (a Mediterranean trip for two travelers)
-loads on first run so every screen is alive immediately.
+Open http://localhost:3000 — starts with an empty trip for Natalia and Orang.
+Add cities in Settings to begin planning.
 
 ## How it works
 

@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import {
-  SAMPLE_TRIP, SAMPLE_CLOSET, SAMPLE_ITINERARY,
-  SAMPLE_ESSENTIALS, INITIAL_PACKED,
+  EMPTY_TRIP, EMPTY_CLOSET, EMPTY_ITINERARY,
+  EMPTY_ESSENTIALS, EMPTY_PACKED,
 } from "./sample-data";
 
 const TripContext = createContext(null);
@@ -11,11 +11,11 @@ const STORAGE_KEY = "no-trunk-v1";
 const LEGACY_STORAGE_KEYS = ["natalia-orang-closet-v1", "voyage-state-v1"];
 
 export function TripProvider({ children }) {
-  const [trip, setTrip] = useState(SAMPLE_TRIP);
-  const [itinerary, setItinerary] = useState(SAMPLE_ITINERARY);
-  const [closet, setCloset] = useState(SAMPLE_CLOSET);
-  const [essentials, setEssentials] = useState(SAMPLE_ESSENTIALS);
-  const [packedPieceIds, setPackedPieceIds] = useState(new Set(INITIAL_PACKED));
+  const [trip, setTrip] = useState(EMPTY_TRIP);
+  const [itinerary, setItinerary] = useState(EMPTY_ITINERARY);
+  const [closet, setCloset] = useState(EMPTY_CLOSET);
+  const [essentials, setEssentials] = useState(EMPTY_ESSENTIALS);
+  const [packedPieceIds, setPackedPieceIds] = useState(new Set(EMPTY_PACKED));
   const [hydrated, setHydrated] = useState(false);
 
   /* Load persisted state after mount (avoids SSR/client mismatch) */
@@ -33,7 +33,7 @@ export function TripProvider({ children }) {
         if (s.packedPieceIds) setPackedPieceIds(new Set(s.packedPieceIds));
       }
     } catch {
-      /* corrupted state — fall back to sample data */
+      /* corrupted state — fall back to empty trip */
     }
     setHydrated(true);
   }, []);
@@ -59,12 +59,27 @@ export function TripProvider({ children }) {
       return next;
     });
 
+  const resetTrip = () => {
+    setTrip(EMPTY_TRIP);
+    setItinerary(EMPTY_ITINERARY);
+    setCloset(EMPTY_CLOSET);
+    setEssentials(EMPTY_ESSENTIALS);
+    setPackedPieceIds(new Set(EMPTY_PACKED));
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+    } catch {
+      /* ignore */
+    }
+  };
+
   const value = {
     trip, setTrip,
     itinerary, setItinerary,
     closet, setCloset,
     essentials, setEssentials,
     packedPieceIds, setPackedPieceIds, togglePiece,
+    resetTrip,
     travelers: trip.travelers,
   };
 

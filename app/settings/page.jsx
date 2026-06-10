@@ -7,11 +7,13 @@ import { uid, fmtDate } from "@/lib/helpers";
 import { useTrip } from "@/lib/trip-context";
 import { Surface, Btn, Eyebrow, Serif, Field } from "@/components/ui/primitives";
 import DropMenu from "@/components/ui/DropMenu";
+import Modal from "@/components/ui/Modal";
 
 export default function SettingsPage() {
-  const { trip, setTrip } = useTrip();
+  const { trip, setTrip, resetTrip } = useTrip();
   const [newCity, setNewCity] = useState({ name: "", startDate: "", endDate: "" });
   const [newTraveler, setNewTraveler] = useState("");
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const addCity = () => {
     if (!newCity.name) return;
@@ -108,6 +110,42 @@ export default function SettingsPage() {
           </Btn>
         </div>
       </Surface>
+
+      <Eyebrow style={{ margin: "38px 0 12px" }}>Start fresh</Eyebrow>
+      <Surface style={{ padding: 22 }}>
+        <p style={{ fontSize: 13.5, color: T.muted, lineHeight: 1.5, marginBottom: 18 }}>
+          Delete this trip and clear everything — closet, looks, itinerary, suitcase, and packing progress.
+          Natalia and Orang stay as travelers.
+        </p>
+        <Btn
+          variant="ghost"
+          small
+          onClick={() => setConfirmReset(true)}
+          style={{ color: T.danger, border: `1px solid ${T.danger}`, padding: "10px 18px" }}
+        >
+          <Trash2 size={13} strokeWidth={1.5} /> Delete this trip
+        </Btn>
+      </Surface>
+
+      {confirmReset && (
+        <Modal title="Delete this trip?" onClose={() => setConfirmReset(false)}>
+          <p style={{ fontSize: 14, color: T.muted, lineHeight: 1.55, marginBottom: 24 }}>
+            This clears <strong style={{ color: T.text }}>{trip.name}</strong> and all its data.
+            It cannot be undone.
+          </p>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Btn variant="secondary" onClick={() => setConfirmReset(false)} style={{ flex: 1 }}>
+              Cancel
+            </Btn>
+            <Btn
+              onClick={() => { resetTrip(); setConfirmReset(false); }}
+              style={{ flex: 1, background: T.danger }}
+            >
+              Delete everything
+            </Btn>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
